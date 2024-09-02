@@ -1,0 +1,4 @@
+env/ 
+venv/
+db.sqlite3
+join_scrum_board/main/migrations
