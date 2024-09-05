@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, get_user_model
 from django.core import serializers
 from django.http import JsonResponse
 from django.contrib.auth import logout
@@ -16,6 +16,11 @@ from add_task.serializers import TaskItemSerializer, SubtaskItemSerializer, Assi
 from contacts.serializers import ContactItemSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication, BasicAuthentication
+from django.contrib.auth.forms import PasswordResetForm
+from django.db.models.query_utils import Q
+from django.template.loader import render_to_string
+#from django.contrib.sites.models import get_current_site
+from django.core.mail import send_mail
 
 class IsLoggedInView(APIView):
     authenticaiton_classes = [TokenAuthentication]
@@ -24,22 +29,23 @@ class IsLoggedInView(APIView):
             print(request.user.is_authenticated)
             return JsonResponse({"status": 1})
         else:
-            return JsonResponse({"status": 2})
-  
+            return JsonResponse({"status": 2}) 
 
 class LoginView(APIView):
     authenticaiton_classes = [TokenAuthentication]
-    #permission_classes = [IsAuthenticated]
     def post(self, request, format=None):
         email = request.POST['email']
         upass = request.POST['password']
         user = authenticate(username=request.POST.get('email'), password=request.POST.get('password'))
-
         get_user_obj = User.objects.filter(username=email).exists()
         if get_user_obj:
-            token, created = Token.objects.get_or_create(user=user)
+            if user:
+                token, created = Token.objects.get_or_create(user=user)
             get_user=User.objects.filter(username=email)
-            check_pass = check_password(upass,get_user[0].password)
+            print("get_user", get_user)
+
+            check_pass = check_password(upass, get_user[0].password)
+            print("check_pass", check_pass)
             if not check_pass:
                 print(f"Password dose not exist with username = {get_user[0].username}")
                 return JsonResponse({
@@ -48,8 +54,6 @@ class LoginView(APIView):
                 })
             else:
                 login(request, user)
-                #user_serialized = serializers.serialize('json', [user])
-                #json_user_serialized = user_serialized[1:-1]
                 userForColor = User.objects.get(username=request.POST.get('email'))
                 userColor = userForColor.useraccount.color
                 return JsonResponse({
@@ -61,7 +65,6 @@ class LoginView(APIView):
                     "userColor": userColor,
                     "token": token.key
                 })
-                #return JsonResponse(user_serialized[1:-1], safe=False)
         else:
             print('Username dose not exist')
             return JsonResponse({
@@ -71,7 +74,6 @@ class LoginView(APIView):
 
 class SignUpView(APIView):
     authenticaiton_classes = [TokenAuthentication]
-    #permission_classes = [IsAuthenticated]
     def post(self, request, format=None):
         newUserData = json.loads(request.body)
         get_user_obj = User.objects.filter(username=newUserData['email']).exists()
@@ -109,8 +111,6 @@ class SignUpView(APIView):
 #@method_decorator(login_required(login_url="http://127.0.0.1:5500/login.html"), name="get")
 class TasksView(APIView): 
     authenticaiton_classes = [TokenAuthentication]
-    #permission_classes = [IsAuthenticated]
-    #@login_required(login_url="http://127.0.0.1:5500/login.html")
     def get(self, request, format=None):
         #tasks = TaskItem.objects.filter(created_by=request.user)
         #tasks = TaskItem.objects.filter(created_by=1)
@@ -121,10 +121,7 @@ class TasksView(APIView):
 
 class SubtasksView(APIView): 
     authenticaiton_classes = [TokenAuthentication]
-    #permission_classes = [IsAuthenticated]
-    #@login_required(login_url="http://127.0.0.1:5500/login.html")
     def get(self, request, format=None):
-        #subtasks = SubtaskItem.objects.filter(created_by=1)
         subtasks = SubtaskItem.objects.all()
         serializer = SubtaskItemSerializer(subtasks, many=True)
         print(Response(serializer.data))
@@ -132,8 +129,6 @@ class SubtasksView(APIView):
 
 class AssignedContactView(APIView): 
     authenticaiton_classes = [TokenAuthentication]
-    #permission_classes = [IsAuthenticated]
-    #@login_required(login_url="http://127.0.0.1:5500/login.html")
     def get(self, request, format=None):
         assignedContacts = AssignedContactItem.objects.all()
         serializer = AssignedContactItemSerializer(assignedContacts, many=True)
@@ -142,14 +137,13 @@ class AssignedContactView(APIView):
 
 class ContactsView(APIView): 
     authenticaiton_classes = [TokenAuthentication]
-    #permission_classes = [IsAuthenticated]
-    #@login_required(login_url="http://127.0.0.1:5500/login.html")
     def get(self, request, format=None):
         contacts = ContactItem.objects.all()
         serializer = ContactItemSerializer(contacts, many=True)
         print(Response(serializer.data))
         return Response(serializer.data)
 
+"""
 class LogoutView(APIView):
     def logout_view(request):
         #if request.method == 'POST':
@@ -157,3 +151,61 @@ class LogoutView(APIView):
         logout(request)
         #Redirect to a success page.
         #return Response({ "status": "OK - User logged out"})
+"""
+       
+"""
+class PasswordResetView(APIView):
+    def password_reset(request):
+        if request.method == 'POST':
+            form = PasswordResetForm(request.POST)
+            if form.is_valid():
+                user_email = form.cleaned_data['email']
+                associated_user = get_user_model().objects.filter(Q(email=user_email)).first()
+                if associated_user:
+                    subject = "Password Reset request"
+                    message = render_to_string("template_reset_password.html", {
+                        'user': associated_user,
+                        'domain': get_current_site(request).domain,
+                        'uid': urlsafe_base64_encode(force_bytes(associated_user.pk)),
+                        'token': account_activation_token.make_token(associated_user),
+                        "protocol": 'https' if request.is_secure() else 'http'
+                    })
+                    try:
+                        mail = send_mail(subject, message, to=[associated_user.email])
+                        mail.success(request,
+                            
+                            #<h2>Password reset sent</h2><hr>
+                            #<p>
+                            #    We've emailed you instructions for setting your password, if an account exists with the email you entered. 
+                            #    You should receive them shortly.<br>If you don't receive an email, please make sure you've entered the address 
+                            #    you registered with, and check your spam folder.
+                            #</p>
+                            
+                        )
+                    except:
+                        mail.error(request, "Problem sending reset password email, <b>SERVER PROBLEM</b>")
+
+                return redirect('homepage')
+
+            #for key, error in list(form.errors.items()):
+               # if key == 'captcha' and error[0] == 'This field is required.':
+               #     messages.error(request, "You must pass the reCAPTCHA test")
+                    continue
+        
+
+        form = PasswordResetForm()
+        return render(request=request, template_name="password_reset.html", context={"form": form})
+"""
+
+"""@user_not_authenticated
+def password_reset_request(request):
+    form = PasswordResetForm()
+    return render(
+        request=request, 
+        template_name="password_reset.html", 
+        context={"form": form}
+        )
+
+def passwordResetConfirm(request, uidb64, token):
+    return redirect("homepage")
+"""

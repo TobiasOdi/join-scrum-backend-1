@@ -4,13 +4,10 @@ import json
 from rest_framework.views import APIView, Response# Create your views here.
 from contacts.models import ContactItem
 from django.contrib.auth.decorators import login_required
-
-# Create your views here.
+from rest_framework.authentication import TokenAuthentication
 
 class SaveCreatedContactView(APIView):
-    #authenticaiton_classes = [TokenAuthentication]
-    #permission_classes = [IsAuthenticated]
-    @login_required(login_url="http://127.0.0.1:5500/login.html")
+    authenticaiton_classes = [TokenAuthentication]
     def post(self, request):
         currentContact = json.loads(request.body)
         print('currentContact', currentContact)
@@ -29,9 +26,7 @@ class SaveCreatedContactView(APIView):
         return Response({ "status": "OK - New contact created"})
 
 class SaveChangedContactView(APIView):
-    #authenticaiton_classes = [TokenAuthentication]
-    #permission_classes = [IsAuthenticated]
-    @login_required(login_url="http://127.0.0.1:5500/login.html")
+    authenticaiton_classes = [TokenAuthentication]
     def post(self, request):
         currentContact = json.loads(request.body)
         print('currentContact', currentContact)
@@ -46,9 +41,7 @@ class SaveChangedContactView(APIView):
         return Response({ "status": "OK - Status category updated"})
 
 class DeleteContactView(APIView):
-    #authenticaiton_classes = [TokenAuthentication]
-    #permission_classes = [IsAuthenticated]
-    @login_required(login_url="http://127.0.0.1:5500/login.html")
+    authenticaiton_classes = [TokenAuthentication]
     def post(self, request):
         currentContact = json.loads(request.body)
         print('currentContact', currentContact)

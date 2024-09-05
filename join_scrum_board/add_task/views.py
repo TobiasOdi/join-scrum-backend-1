@@ -3,18 +3,17 @@ from django.views.decorators.csrf import csrf_exempt
 from django.template.context_processors import csrf
 from add_task.models import CategoryItem
 from add_task.serializers import CategoryItemSerializer
-from rest_framework.views import APIView, Response# Create your views here.
+from rest_framework.views import APIView, Response
 from add_task.models import TaskItem, AssignedContactItem, SubtaskItem
 from contacts.models import ContactItem
 import json
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core import serializers
+from rest_framework.authentication import TokenAuthentication
 
 class CategoriesView(APIView): 
-    #authenticaiton_classes = [TokenAuthentication]
-    #permission_classes = [IsAuthenticated]
-    #@login_required(login_url="http://127.0.0.1:5500/login.html")
+    authenticaiton_classes = [TokenAuthentication]
     def get(self, request, format=None):
         #tasks = TaskItem.objects.filter(created_by=request.user)
         categories = CategoryItem.objects.all()
@@ -22,9 +21,7 @@ class CategoriesView(APIView):
         return Response(serializer.data)  
     
 class SaveCreatedTaskView(APIView):
-    #authenticaiton_classes = [TokenAuthentication]
-    #permission_classes = [IsAuthenticated]
-    #@login_required(login_url="http://127.0.0.1:5500/login.html")
+    authenticaiton_classes = [TokenAuthentication]
     def post(self, request):
         currentTask = json.loads(request.body)
         print('currentTask', currentTask)
@@ -65,9 +62,7 @@ class SaveCreatedTaskView(APIView):
         return Response({ "status": "OK - New task created"})
 
 class SaveCreatedCategoryView(APIView):
-    #authenticaiton_classes = [TokenAuthentication]
-    #permission_classes = [IsAuthenticated]
-    #@login_required(login_url="http://127.0.0.1:5500/login.html")
+    authenticaiton_classes = [TokenAuthentication]
     def post(self, request):
         newCategory = json.loads(request.body)
         print('newCategory', newCategory)
@@ -81,9 +76,7 @@ class SaveCreatedCategoryView(APIView):
         return Response({ "status": "OK - Category created"})
 
 class DeleteCategoryView(APIView):
-    #authenticaiton_classes = [TokenAuthentication]
-    #permission_classes = [IsAuthenticated]
-    #@login_required(login_url="http://127.0.0.1:5500/login.html")
+    authenticaiton_classes = [TokenAuthentication]
     def post(self, request):
         currentCategory = json.loads(request.body)
         print('currentCategory', currentCategory)

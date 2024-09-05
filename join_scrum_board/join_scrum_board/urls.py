@@ -17,7 +17,7 @@ Including another URLconf
 from django.urls import include
 from django.contrib import admin
 from django.urls import path
-from main.views import IsLoggedInView, LoginView, SignUpView, TasksView, SubtasksView, AssignedContactView, ContactsView, LogoutView
+from main.views import IsLoggedInView, LoginView, SignUpView, TasksView, SubtasksView, AssignedContactView, ContactsView
 from add_task.views import CategoriesView, SaveCreatedTaskView, SaveCreatedCategoryView, DeleteCategoryView
 from contacts.views import SaveCreatedContactView, SaveChangedContactView, DeleteContactView
 from board.views import DeleteTaskView, SaveTaskCategoryView, SaveEditedTaskView
@@ -28,7 +28,9 @@ urlpatterns = [
     path('isLoggedIn/', IsLoggedInView.as_view()),
     path('login/', LoginView.as_view()),
     path('signUp/', SignUpView.as_view()),
-    path('logout/', LogoutView.as_view()),
+    #path('logout/', LogoutView.as_view()),
+    #path('resetPassword/', PasswordResetView.as_view(), name="password_reset"),
+    #path('reset/<uidb64>/<token>', views.passwordResetConfirm, name='password_reset_confirm'),
     #path('', SignUpView.as_view()),
     path('tasks/', TasksView.as_view()),
     path('subtasks/', SubtasksView.as_view()),
