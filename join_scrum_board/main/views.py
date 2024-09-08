@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, get_user_model
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
@@ -40,11 +41,11 @@ class LoginView(APIView):
         if get_user_obj:
             if user:
                 token, created = Token.objects.get_or_create(user=user)
-            get_user=User.objects.filter(username=email)
-            print("get_user", get_user)
+                get_user=User.objects.filter(username=email)
+                print("get_user", get_user)
 
-            check_pass = check_password(upass, get_user[0].password)
-            print("check_pass", check_pass)
+                check_pass = check_password(upass, get_user[0].password)
+                print("check_pass", check_pass)
             if not check_pass:
                 print(f"Password dose not exist with username = {get_user[0].username}")
                 return JsonResponse({
@@ -154,50 +155,36 @@ class LogoutView(APIView):
        
 
 class PasswordResetView(APIView):
-    def password_reset(request):
-        if request.method == 'POST':
-            form = PasswordResetForm(request.POST)
-            if form.is_valid():
-                user_email = form.cleaned_data['email']
-                associated_user = get_user_model().objects.filter(Q(email=user_email)).first()
-                if associated_user:
-                    subject = "Password Reset request"
-                    message = render_to_string("template_reset_password.html", {
-                        'user': associated_user,
-                        'domain': get_current_site(request).domain,
-                        'uid': urlsafe_base64_encode(force_bytes(associated_user.pk)),
-                        #'token': default_token_generator.make_token(associated_user),
-                        'token': Token.objects.get(user=associated_user),
-                        "protocol": 'https' if request.is_secure() else 'http'
-                    })
-                    try:
-                        mail = send_mail(subject, message, to=[associated_user.email])
-                        mail.success(request,
-                            
-                            #<h2>Password reset sent</h2><hr>
-                            #<p>
-                            #    We've emailed you instructions for setting your password, if an account exists with the email you entered. 
-                            #    You should receive them shortly.<br>If you don't receive an email, please make sure you've entered the address 
-                            #    you registered with, and check your spam folder.
-                            #</p>
-                            
-                        )
-                        return Response({ "status": 2})
+    @csrf_exempt
+    def post(self, request):
+        email = request.POST['email']
+        get_user_obj = User.objects.filter(username=email).exists()
+        if get_user_obj:
+            user = User.objects.get(username=email)
+            token, created = Token.objects.get_or_create(user=user)
+            subject = "Password Reset request"
+            message = render_to_string("template_reset_password.html", {
+                'user': user.first_name,
+                'domain': get_current_site(request).domain,
+                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                #'token': default_token_generator.make_token(user),
+                'token': token,
+                "protocol": 'https' if request.is_secure() else 'http'
+            })
+            try:
+                mail = send_mail(subject, message, "do_not_reply@join.example", recipient_list = [email,], fail_silently=False)
+                print(mail)
+                return Response({ "status": 3})
 
-                    except:
-                        mail.error(request, "Problem sending reset password email, <b>SERVER PROBLEM</b>")
-                else:
-                    return Response({ "status": 1})
+            except NameError:
+                print("Problem sending reset password email", NameError)
+                return Response({ "status": 2})
+        else:
+            return Response({ "status": 1})
 
-        #for key, error in list(form.errors.items()):
-            # if key == 'captcha' and error[0] == 'This field is required.':
-            #     messages.error(request, "You must pass the reCAPTCHA test")
-               
-        
-
-        form = PasswordResetForm()
-        return render(request=request, template_name="password_reset.html", context={"form": form})
-
+    #for key, error in list(form.errors.items()):
+        # if key == 'captcha' and error[0] == 'This field is required.':
+        #     messages.error(request, "You must pass the reCAPTCHA test")
 
 """@user_not_authenticated
 def password_reset_request(request):
@@ -207,7 +194,8 @@ def password_reset_request(request):
         template_name="password_reset.html", 
         context={"form": form}
         )
+"""
+
 
 def passwordResetConfirm(request, uidb64, token):
     return redirect("homepage")
-"""

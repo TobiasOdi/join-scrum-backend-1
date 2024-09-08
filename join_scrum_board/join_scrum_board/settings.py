@@ -189,3 +189,11 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',  # Add this line
     ],
 }
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'mail.gmx.com'
+EMAIL_PORT = '587'
+EMAIL_HOST_USER = 'tobias.odermatt@gmx.net'
+EMAIL_HOST_PASSWORD = 'Xc+%kjzUR3NBim?'
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
