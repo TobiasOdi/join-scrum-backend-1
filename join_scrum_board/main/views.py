@@ -1,12 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, get_user_model
-from django.core import serializers
 from django.http import JsonResponse
-from django.contrib.auth import logout
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import User
-from django.utils.decorators import method_decorator
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
 import json
 from main.models import UserAccount
 from add_task.models import TaskItem, SubtaskItem, AssignedContactItem
@@ -15,11 +12,13 @@ from rest_framework.views import APIView, Response
 from add_task.serializers import TaskItemSerializer, SubtaskItemSerializer, AssignedContactItemSerializer
 from contacts.serializers import ContactItemSerializer
 from rest_framework.authtoken.models import Token
-from rest_framework.authentication import TokenAuthentication, BasicAuthentication
+from rest_framework.authentication import TokenAuthentication
 from django.contrib.auth.forms import PasswordResetForm
 from django.db.models.query_utils import Q
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
 from django.template.loader import render_to_string
-#from django.contrib.sites.models import get_current_site
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail
 
 class IsLoggedInView(APIView):
@@ -153,7 +152,7 @@ class LogoutView(APIView):
         #return Response({ "status": "OK - User logged out"})
 """
        
-"""
+
 class PasswordResetView(APIView):
     def password_reset(request):
         if request.method == 'POST':
@@ -167,7 +166,8 @@ class PasswordResetView(APIView):
                         'user': associated_user,
                         'domain': get_current_site(request).domain,
                         'uid': urlsafe_base64_encode(force_bytes(associated_user.pk)),
-                        'token': account_activation_token.make_token(associated_user),
+                        #'token': default_token_generator.make_token(associated_user),
+                        'token': Token.objects.get(user=associated_user),
                         "protocol": 'https' if request.is_secure() else 'http'
                     })
                     try:
@@ -182,20 +182,22 @@ class PasswordResetView(APIView):
                             #</p>
                             
                         )
+                        return Response({ "status": 2})
+
                     except:
                         mail.error(request, "Problem sending reset password email, <b>SERVER PROBLEM</b>")
+                else:
+                    return Response({ "status": 1})
 
-                return redirect('homepage')
-
-            #for key, error in list(form.errors.items()):
-               # if key == 'captcha' and error[0] == 'This field is required.':
-               #     messages.error(request, "You must pass the reCAPTCHA test")
-                    continue
+        #for key, error in list(form.errors.items()):
+            # if key == 'captcha' and error[0] == 'This field is required.':
+            #     messages.error(request, "You must pass the reCAPTCHA test")
+               
         
 
         form = PasswordResetForm()
         return render(request=request, template_name="password_reset.html", context={"form": form})
-"""
+
 
 """@user_not_authenticated
 def password_reset_request(request):
