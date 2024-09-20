@@ -13,17 +13,10 @@ from rest_framework.authentication import TokenAuthentication
 class SaveCreatedTaskView(APIView):
     authenticaiton_classes = [TokenAuthentication]
     def post(self, request):
-        currentTask = json.loads(request.body)
-        print('currentTask', currentTask)
-       
+        currentTask = json.loads(request.body)      
         taskData = currentTask[0]['taskData']
         subtaskData = currentTask[0]['subtaskData']
         assignedToData = currentTask[0]['assignedToData']
-        
-        print("CURRENT USER", request.user)
-        print("CURRENT USER", request.user)
-
-
         newTask = TaskItem.objects.create(
             category=taskData[0]['category'], 
             created_by=request.user,
@@ -43,7 +36,6 @@ class SaveCreatedTaskView(APIView):
 
         for assignedContact in assignedToData:
             contactId = ContactItem.objects.filter(id=assignedContact)     
-            #print("CONTACT ITEM CORRECT??", contactId)          
             AssignedContactItem.objects.create(
                 parent_task_id=newTask,
                 contact_id=contactId[0]
@@ -55,7 +47,6 @@ class SaveCreatedCategoryView(APIView):
     authenticaiton_classes = [TokenAuthentication]
     def post(self, request):
         newCategory = json.loads(request.body)
-        print('newCategory', newCategory)
         
         CategoryItem.objects.create(
             categoryName=newCategory['categoryName'], 
@@ -68,8 +59,6 @@ class SaveCreatedCategoryView(APIView):
 class DeleteCategoryView(APIView):
     authenticaiton_classes = [TokenAuthentication]
     def post(self, request):
-        currentCategory = json.loads(request.body)
-        print('currentCategory', currentCategory)
-        
+        currentCategory = json.loads(request.body)        
         CategoryItem.objects.filter(id=currentCategory['id']).delete()
         return Response({ "status": "OK - Catgory deleted"})

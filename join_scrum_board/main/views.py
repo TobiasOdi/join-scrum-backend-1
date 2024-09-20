@@ -82,6 +82,8 @@ class SignUpView(APIView):
                 first_name=newUserData['first_name'],
                 last_name=newUserData['last_name']
             )
+            new_user.set_password(newUserData['password'])
+            new_user.save()
             
             UserAccount.objects.create(
                 user=new_user,
@@ -140,7 +142,6 @@ class PasswordResetView(APIView):
             user = User.objects.get(username=email)
             token, created = Token.objects.get_or_create(user=user)
             subject = "Password Reset request"
-            print("USER ID", user.pk)
             pass
             message = render_to_string("email_template_pw_reset.html", {
                 'user': user.first_name,
@@ -151,7 +152,6 @@ class PasswordResetView(APIView):
                 'token': token,
                 "protocol": 'https' if request.is_secure() else 'http'
             })
-            print(message)
             try:
                 mail = send_mail(
                     subject, 
@@ -159,7 +159,6 @@ class PasswordResetView(APIView):
                     from_email='tobias.odermatt@gmx.net',
                     recipient_list = [email,], 
                     fail_silently=False)
-                print(mail)
                 return Response({ "status": 3})
 
             except NameError:
@@ -172,16 +171,12 @@ class SetNewPasswordView(APIView):
     def post(self, request):
         newPassword = request.POST['newPw']
         uid = request.POST['uid']
+        pass
         get_user_obj = User.objects.filter(pk=uid)
         if get_user_obj:
             user = User.objects.get(pk=uid)
-            print("PASSWORT VOR", get_user_obj[0].password)
             get_user_obj[0].set_password(newPassword)
             get_user_obj[0].save()          
-            #usernewPW = User.objects.filter(pk=uid).update(
-            #    password=newPassword,
-            #)
-            print("PASSWORT NACH", get_user_obj[0].password)
             return JsonResponse({"status": 1})
         else:
             print('User dose not exist')

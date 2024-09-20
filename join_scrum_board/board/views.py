@@ -19,18 +19,14 @@ class SaveTaskCategoryView(APIView):
 class DeleteTaskView(APIView):
     authenticaiton_classes = [TokenAuthentication]
     def post(self, request):
-        currentTask = json.loads(request.body)
-        print('currentTask', currentTask)
-        
+        currentTask = json.loads(request.body)      
         TaskItem.objects.filter(id=currentTask['id']).delete()
         return Response({ "status": "OK - Task deleted"})
     
 class SaveEditedTaskView(APIView):
     authenticaiton_classes = [TokenAuthentication]
     def post(self, request):
-        currentTask = json.loads(request.body)
-        print('currentTask', currentTask)
-        
+        currentTask = json.loads(request.body)        
         taskData = currentTask[0]['taskData']
         subtaskData = currentTask[0]['subtaskData']
         assignedToData = currentTask[0]['assignedToData']

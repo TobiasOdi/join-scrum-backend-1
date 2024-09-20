@@ -10,8 +10,6 @@ class SaveCreatedContactView(APIView):
     authenticaiton_classes = [TokenAuthentication]
     def post(self, request):
         currentContact = json.loads(request.body)
-        print('currentContact', currentContact)
-       
         #contactData = currentContact[0]['taskData']
         
         ContactItem.objects.create(
@@ -29,8 +27,6 @@ class SaveChangedContactView(APIView):
     authenticaiton_classes = [TokenAuthentication]
     def post(self, request):
         currentContact = json.loads(request.body)
-        print('currentContact', currentContact)
-        print("JSON", currentContact['id'])
         
         ContactItem.objects.filter(pk=currentContact['id']).update(
             first_name=currentContact['first_name'],
@@ -44,7 +40,6 @@ class DeleteContactView(APIView):
     authenticaiton_classes = [TokenAuthentication]
     def post(self, request):
         currentContact = json.loads(request.body)
-        print('currentContact', currentContact)
         
         if currentContact['active_user'] == None:
             ContactItem.objects.filter(id=currentContact['id']).delete()
