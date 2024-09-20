@@ -106,21 +106,14 @@ class DataView(APIView):
     def get(self, request, format=None):
         tasks = TaskItem.objects.all()
         task_serializer = TaskItemSerializer(tasks, many=True)
-        
         subtasks = SubtaskItem.objects.all()
         subtasks_serializer = SubtaskItemSerializer(subtasks, many=True)
-
         assignedContacts = AssignedContactItem.objects.all()
         assignedContacts_serializer = AssignedContactItemSerializer(assignedContacts, many=True)
-
         contacts = ContactItem.objects.all()
         contacts_serializer = ContactItemSerializer(contacts, many=True)
-        
         categories = CategoryItem.objects.all()
-        categories_serializer = CategoryItemSerializer(categories, many=True)
-
-        
-        #print(Response(serializer.data))
+        categories_serializer = CategoryItemSerializer(categories, many=True)       
         return Response(
             {
                 'tasks': task_serializer.data,
@@ -137,18 +130,7 @@ class CategoriesView(APIView):
         categories = CategoryItem.objects.all()
         serializer = CategoryItemSerializer(categories, many=True)
         return Response(serializer.data)  
-
-
-"""
-class LogoutView(APIView):
-    def logout_view(request):
-        #if request.method == 'POST':
-        #if "logout" in request.body:
-        logout(request)
-        #Redirect to a success page.
-        #return Response({ "status": "OK - User logged out"})
-"""
-       
+      
 
 class PasswordResetView(APIView):
     def post(self, request):
@@ -186,45 +168,6 @@ class PasswordResetView(APIView):
         else:
             return Response({ "status": 1})
 
-
-"""
-def password_reset_request(request):
-    form = PasswordResetForm()
-    return render(
-        request=request, 
-        template_name="password_reset.html", 
-        context={"form": form}
-        )
-"""
-
-"""
-class PasswordResetConfirmView(APIView):
-    def passwordResetConfirm(request, uidb64, token):
-        User = get_user_model()
-        try:
-            uid = force_str(urlsafe_base64_decode(uidb64))
-            print("UID", uid)
-            user = User.objects.get(pk=uid)
-            print("USER", user)
-
-            user_with_token = Token.objects.get(user=user)
-            print("USER TOKEN", user.token)
-            print("USER WITH TOKEN", user_with_token)
-        except:
-            user = None
-
-        if user is not None and token == user_with_token:
-            if request.method == 'POST':
-                # Redirect to change password html
-                return Response({ "status": 1})
-        else:
-            print(request, "Link is expired")
-            return Response({ "status": 2})
-
-        pass
-        print(request, 'Something went wrong, redirecting back to Homepage')
-        return Response({ "status": 3})
-"""
 class SetNewPasswordView(APIView):
     def post(self, request):
         newPassword = request.POST['newPw']

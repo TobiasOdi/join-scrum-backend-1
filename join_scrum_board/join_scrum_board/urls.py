@@ -29,7 +29,6 @@ urlpatterns = [
     path('login/', LoginView.as_view()),
     path('signUp/', SignUpView.as_view()),
     path('resetPassword/', PasswordResetView.as_view()),
-    #path('reset/<uidb64>/<token>', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('setNewPassword/', SetNewPasswordView.as_view()),
     path('data/', DataView.as_view()),
     path('saveTaskCategory/', SaveTaskCategoryView.as_view()),
