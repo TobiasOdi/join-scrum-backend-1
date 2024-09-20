@@ -8,32 +8,32 @@ from rest_framework.authentication import TokenAuthentication
 
 class SaveTaskCategoryView(APIView):
     authenticaiton_classes = [TokenAuthentication]
-    def post(self, request):
+    def post(self, request, task_id):
         currentTask = json.loads(request.body)
-        print("JSON", currentTask['id'])
-        TaskItem.objects.filter(pk=currentTask['id']).update(
+        #print("JSON", currentTask['id'])
+        TaskItem.objects.filter(pk=task_id).update(
             statusCategory=currentTask['statusCategory'],
         )      
         return Response({ "status": "OK - Status category updated"})
 
 class DeleteTaskView(APIView):
     authenticaiton_classes = [TokenAuthentication]
-    def post(self, request):
-        currentTask = json.loads(request.body)      
-        TaskItem.objects.filter(id=currentTask['id']).delete()
+    def post(self, request, task_id):
+        #currentTask = json.loads(request.body)      
+        TaskItem.objects.filter(id=task_id).delete()
         return Response({ "status": "OK - Task deleted"})
     
 class SaveEditedTaskView(APIView):
     authenticaiton_classes = [TokenAuthentication]
-    def post(self, request):
+    def post(self, request, task_id):
         currentTask = json.loads(request.body)        
         taskData = currentTask[0]['taskData']
         subtaskData = currentTask[0]['subtaskData']
         assignedToData = currentTask[0]['assignedToData']
 
-        get_current_Task=TaskItem.objects.filter(pk=taskData[0]['id'])
+        get_current_Task=TaskItem.objects.filter(pk=task_id)
 
-        TaskItem.objects.filter(pk=taskData[0]['id']).update(
+        TaskItem.objects.filter(pk=task_id).update(
             category=taskData[0]['category'], 
             description=taskData[0]['description'],
             due_date=taskData[0]['due_date'],

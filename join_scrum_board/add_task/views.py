@@ -53,12 +53,11 @@ class SaveCreatedCategoryView(APIView):
             color=newCategory['color'],
             categoryType=newCategory['categoryType'],
         )  
-        
         return Response({ "status": "OK - Category created"})
 
 class DeleteCategoryView(APIView):
     authenticaiton_classes = [TokenAuthentication]
-    def post(self, request):
-        currentCategory = json.loads(request.body)        
-        CategoryItem.objects.filter(id=currentCategory['id']).delete()
+    def post(self, request, category_id):
+        #currentCategory = json.loads(request.body)        
+        CategoryItem.objects.filter(id=category_id).delete()
         return Response({ "status": "OK - Catgory deleted"})
