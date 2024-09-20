@@ -7,10 +7,10 @@ from django.contrib.auth.models import User
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 import json
 from main.models import UserAccount
-from add_task.models import TaskItem, SubtaskItem, AssignedContactItem
+from add_task.models import TaskItem, SubtaskItem, AssignedContactItem, CategoryItem
 from contacts.models import ContactItem
 from rest_framework.views import APIView, Response
-from add_task.serializers import TaskItemSerializer, SubtaskItemSerializer, AssignedContactItemSerializer
+from add_task.serializers import TaskItemSerializer, SubtaskItemSerializer, AssignedContactItemSerializer, CategoryItemSerializer
 from contacts.serializers import ContactItemSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
@@ -101,40 +101,43 @@ class SignUpView(APIView):
             #userColor = userForColor.useraccount.color   
             return Response({ "status": "OK - New user and contact created"})
 
-#@method_decorator(login_required(login_url="http://127.0.0.1:5500/login.html"), name="get")
-class TasksView(APIView): 
+class DataView(APIView):
+    authenticaiton_classes = [TokenAuthentication]
+    def get(self, request, format=None):
+        tasks = TaskItem.objects.all()
+        task_serializer = TaskItemSerializer(tasks, many=True)
+        
+        subtasks = SubtaskItem.objects.all()
+        subtasks_serializer = SubtaskItemSerializer(subtasks, many=True)
+
+        assignedContacts = AssignedContactItem.objects.all()
+        assignedContacts_serializer = AssignedContactItemSerializer(assignedContacts, many=True)
+
+        contacts = ContactItem.objects.all()
+        contacts_serializer = ContactItemSerializer(contacts, many=True)
+        
+        categories = CategoryItem.objects.all()
+        categories_serializer = CategoryItemSerializer(categories, many=True)
+
+        
+        #print(Response(serializer.data))
+        return Response(
+            {
+                'tasks': task_serializer.data,
+                'subtasks': subtasks_serializer.data,
+                'assignedContacts': assignedContacts_serializer.data,
+                'contacts': contacts_serializer.data,
+                'categories': categories_serializer.data
+            })
+
+class CategoriesView(APIView): 
     authenticaiton_classes = [TokenAuthentication]
     def get(self, request, format=None):
         #tasks = TaskItem.objects.filter(created_by=request.user)
-        #tasks = TaskItem.objects.filter(created_by=1)
-        tasks = TaskItem.objects.all()
-        serializer = TaskItemSerializer(tasks, many=True)
-        print(Response(serializer.data))
-        return Response(serializer.data)
+        categories = CategoryItem.objects.all()
+        serializer = CategoryItemSerializer(categories, many=True)
+        return Response(serializer.data)  
 
-class SubtasksView(APIView): 
-    authenticaiton_classes = [TokenAuthentication]
-    def get(self, request, format=None):
-        subtasks = SubtaskItem.objects.all()
-        serializer = SubtaskItemSerializer(subtasks, many=True)
-        print(Response(serializer.data))
-        return Response(serializer.data)
-
-class AssignedContactView(APIView): 
-    authenticaiton_classes = [TokenAuthentication]
-    def get(self, request, format=None):
-        assignedContacts = AssignedContactItem.objects.all()
-        serializer = AssignedContactItemSerializer(assignedContacts, many=True)
-        print(Response(serializer.data))
-        return Response(serializer.data)
-
-class ContactsView(APIView): 
-    authenticaiton_classes = [TokenAuthentication]
-    def get(self, request, format=None):
-        contacts = ContactItem.objects.all()
-        serializer = ContactItemSerializer(contacts, many=True)
-        print(Response(serializer.data))
-        return Response(serializer.data)
 
 """
 class LogoutView(APIView):

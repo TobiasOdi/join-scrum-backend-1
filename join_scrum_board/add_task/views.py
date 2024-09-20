@@ -1,8 +1,5 @@
 from django.shortcuts import render
-from django.views.decorators.csrf import csrf_exempt
-from django.template.context_processors import csrf
 from add_task.models import CategoryItem
-from add_task.serializers import CategoryItemSerializer
 from rest_framework.views import APIView, Response
 from add_task.models import TaskItem, AssignedContactItem, SubtaskItem
 from contacts.models import ContactItem
@@ -12,14 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.core import serializers
 from rest_framework.authentication import TokenAuthentication
 
-class CategoriesView(APIView): 
-    authenticaiton_classes = [TokenAuthentication]
-    def get(self, request, format=None):
-        #tasks = TaskItem.objects.filter(created_by=request.user)
-        categories = CategoryItem.objects.all()
-        serializer = CategoryItemSerializer(categories, many=True)
-        return Response(serializer.data)  
-    
+  
 class SaveCreatedTaskView(APIView):
     authenticaiton_classes = [TokenAuthentication]
     def post(self, request):

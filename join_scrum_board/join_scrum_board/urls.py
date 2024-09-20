@@ -17,8 +17,8 @@ Including another URLconf
 from django.urls import include
 from django.contrib import admin
 from django.urls import path
-from main.views import IsLoggedInView, LoginView, SignUpView, TasksView, SubtasksView, AssignedContactView, ContactsView, PasswordResetView, SetNewPasswordView
-from add_task.views import CategoriesView, SaveCreatedTaskView, SaveCreatedCategoryView, DeleteCategoryView
+from main.views import IsLoggedInView, LoginView, SignUpView, PasswordResetView, SetNewPasswordView, DataView
+from add_task.views import SaveCreatedTaskView, SaveCreatedCategoryView, DeleteCategoryView
 from contacts.views import SaveCreatedContactView, SaveChangedContactView, DeleteContactView
 from board.views import DeleteTaskView, SaveTaskCategoryView, SaveEditedTaskView
 
@@ -31,11 +31,7 @@ urlpatterns = [
     path('resetPassword/', PasswordResetView.as_view()),
     #path('reset/<uidb64>/<token>', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('setNewPassword/', SetNewPasswordView.as_view()),
-    path('tasks/', TasksView.as_view()),
-    path('subtasks/', SubtasksView.as_view()),
-    path('assignedTo/', AssignedContactView.as_view()),
-    path('categories/', CategoriesView.as_view()),
-    path('contacts/', ContactsView.as_view()),
+    path('data/', DataView.as_view()),
     path('saveTaskCategory/', SaveTaskCategoryView.as_view()),
     path('saveCreatedTask/', SaveCreatedTaskView.as_view()),
     path('saveEditedTask/', SaveEditedTaskView.as_view()),
