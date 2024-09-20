@@ -14,10 +14,10 @@ from add_task.serializers import TaskItemSerializer, SubtaskItemSerializer, Assi
 from contacts.serializers import ContactItemSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
-from django.contrib.auth.forms import PasswordResetForm
+from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
 from django.db.models.query_utils import Q
-from django.utils.http import urlsafe_base64_encode
-from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
 from django.template.loader import render_to_string
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail
@@ -38,21 +38,12 @@ class LoginView(APIView):
         upass = request.POST['password']
         user = authenticate(username=request.POST.get('email'), password=request.POST.get('password'))
         get_user_obj = User.objects.filter(username=email).exists()
+        pass
         if get_user_obj:
+            get_user=User.objects.filter(username=email)
             if user:
                 token, created = Token.objects.get_or_create(user=user)
-                get_user=User.objects.filter(username=email)
-                print("get_user", get_user)
-
                 check_pass = check_password(upass, get_user[0].password)
-                print("check_pass", check_pass)
-            if not check_pass:
-                print(f"Password dose not exist with username = {get_user[0].username}")
-                return JsonResponse({
-                    #"id": request.id,
-                    "status": 1
-                })
-            else:
                 login(request, user)
                 userForColor = User.objects.get(username=request.POST.get('email'))
                 userColor = userForColor.useraccount.color
@@ -64,13 +55,15 @@ class LoginView(APIView):
                     "email": user.email,
                     "userColor": userColor,
                     "token": token.key
-                })
+                })                
+                
+            else:
+                print(f"Password dose not exist with username = {get_user[0].username}")
+                return JsonResponse({"status": 1})
+            
         else:
             print('Username dose not exist')
-            return JsonResponse({
-                #"id": request.id,
-                "status": 2
-            })
+            return JsonResponse({"status": 2 })
 
 class SignUpView(APIView):
     authenticaiton_classes = [TokenAuthentication]
@@ -155,7 +148,6 @@ class LogoutView(APIView):
        
 
 class PasswordResetView(APIView):
-    @csrf_exempt
     def post(self, request):
         email = request.POST['email']
         get_user_obj = User.objects.filter(username=email).exists()
@@ -163,16 +155,25 @@ class PasswordResetView(APIView):
             user = User.objects.get(username=email)
             token, created = Token.objects.get_or_create(user=user)
             subject = "Password Reset request"
-            message = render_to_string("template_reset_password.html", {
+            print("USER ID", user.pk)
+            pass
+            message = render_to_string("email_template_pw_reset.html", {
                 'user': user.first_name,
                 'domain': get_current_site(request).domain,
-                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                'uid': user.pk,
+                #'uid': urlsafe_base64_encode(force_bytes(user.pk)),
                 #'token': default_token_generator.make_token(user),
                 'token': token,
                 "protocol": 'https' if request.is_secure() else 'http'
             })
+            print(message)
             try:
-                mail = send_mail(subject, message, "do_not_reply@join.example", recipient_list = [email,], fail_silently=False)
+                mail = send_mail(
+                    subject, 
+                    message, 
+                    from_email='tobias.odermatt@gmx.net',
+                    recipient_list = [email,], 
+                    fail_silently=False)
                 print(mail)
                 return Response({ "status": 3})
 
@@ -182,11 +183,8 @@ class PasswordResetView(APIView):
         else:
             return Response({ "status": 1})
 
-    #for key, error in list(form.errors.items()):
-        # if key == 'captcha' and error[0] == 'This field is required.':
-        #     messages.error(request, "You must pass the reCAPTCHA test")
 
-"""@user_not_authenticated
+"""
 def password_reset_request(request):
     form = PasswordResetForm()
     return render(
@@ -196,6 +194,49 @@ def password_reset_request(request):
         )
 """
 
+"""
+class PasswordResetConfirmView(APIView):
+    def passwordResetConfirm(request, uidb64, token):
+        User = get_user_model()
+        try:
+            uid = force_str(urlsafe_base64_decode(uidb64))
+            print("UID", uid)
+            user = User.objects.get(pk=uid)
+            print("USER", user)
 
-def passwordResetConfirm(request, uidb64, token):
-    return redirect("homepage")
+            user_with_token = Token.objects.get(user=user)
+            print("USER TOKEN", user.token)
+            print("USER WITH TOKEN", user_with_token)
+        except:
+            user = None
+
+        if user is not None and token == user_with_token:
+            if request.method == 'POST':
+                # Redirect to change password html
+                return Response({ "status": 1})
+        else:
+            print(request, "Link is expired")
+            return Response({ "status": 2})
+
+        pass
+        print(request, 'Something went wrong, redirecting back to Homepage')
+        return Response({ "status": 3})
+"""
+class SetNewPasswordView(APIView):
+    def post(self, request):
+        newPassword = request.POST['newPw']
+        uid = request.POST['uid']
+        get_user_obj = User.objects.filter(pk=uid)
+        if get_user_obj:
+            user = User.objects.get(pk=uid)
+            print("PASSWORT VOR", get_user_obj[0].password)
+            get_user_obj[0].set_password(newPassword)
+            get_user_obj[0].save()          
+            #usernewPW = User.objects.filter(pk=uid).update(
+            #    password=newPassword,
+            #)
+            print("PASSWORT NACH", get_user_obj[0].password)
+            return JsonResponse({"status": 1})
+        else:
+            print('User dose not exist')
+            return JsonResponse({"status": 2})
