@@ -17,7 +17,7 @@ Including another URLconf
 from django.urls import include
 from django.contrib import admin
 from django.urls import path
-from main.views import IsLoggedInView, LoginView, SignUpView, PasswordResetView, SetNewPasswordView, DataView
+from main.views import IsLoggedInView, LoginView, SignUpView, PasswordResetView, SetNewPasswordView, DataView, GetTimestampView, SetTimestampView
 from add_task.views import SaveCreatedTaskView, SaveCreatedCategoryView, DeleteCategoryView
 from contacts.views import SaveCreatedContactView, SaveChangedContactView, DeleteContactView
 from board.views import DeleteTaskView, SaveTaskCategoryView, SaveEditedTaskView
@@ -29,6 +29,8 @@ urlpatterns = [
     path('user/sign_up/', SignUpView.as_view()),
     path('user/reset_password/', PasswordResetView.as_view()),
     path('user/set_new_password/', SetNewPasswordView.as_view()),
+    path('user/get_timestamp/<user_id>/', GetTimestampView.as_view()),
+    path('user/set_timestamp/', SetTimestampView.as_view()),
     path('data/', DataView.as_view()),
     path('tasks/save_task_category/<task_id>/', SaveTaskCategoryView.as_view()),
     path('tasks/save_created_category/', SaveCreatedCategoryView.as_view()),   

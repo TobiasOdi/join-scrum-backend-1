@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.conf import settings
 
 
 # Create your models here.
@@ -11,3 +12,9 @@ class UserAccount(models.Model):
     def __str__(self):
         return self.color
     
+class PwResetTimestamp(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    timestamp = models.IntegerField(default=0)    
+    
+    def __str__(self):
+        return str(self.timestamp)

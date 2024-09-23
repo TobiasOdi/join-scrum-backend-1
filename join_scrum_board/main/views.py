@@ -6,11 +6,14 @@ from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 import json
-from main.models import UserAccount
+import time
+import calendar;
+from main.models import UserAccount, PwResetTimestamp
 from add_task.models import TaskItem, SubtaskItem, AssignedContactItem, CategoryItem
 from contacts.models import ContactItem
 from rest_framework.views import APIView, Response
 from add_task.serializers import TaskItemSerializer, SubtaskItemSerializer, AssignedContactItemSerializer, CategoryItemSerializer
+from main.serializers import PwResetTimestampSerializer
 from contacts.serializers import ContactItemSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
@@ -124,6 +127,7 @@ class DataView(APIView):
                 'contacts': contacts_serializer.data,
                 'categories': categories_serializer.data
             })
+        
 
 class CategoriesView(APIView): 
     authenticaiton_classes = [TokenAuthentication]
@@ -132,17 +136,47 @@ class CategoriesView(APIView):
         categories = CategoryItem.objects.all()
         serializer = CategoryItemSerializer(categories, many=True)
         return Response(serializer.data)  
-      
+
+class GetTimestampView(APIView): 
+    def get(self, request, user_id):
+        user= User.objects.get(pk=user_id)      
+        if PwResetTimestamp.objects.filter(user=user):
+            user_timestamp = PwResetTimestamp.objects.filter(user=user)
+            print(user_timestamp)
+            serializer = PwResetTimestampSerializer(user_timestamp[0])
+            return Response(serializer.data)
+        else:
+            print("No timestamp entry")
+            return Response("OK")  
+
+class SetTimestampView(APIView):
+    #authenticaiton_classes = [TokenAuthentication]
+    def post(self, request):
+        data = json.loads(request.body)
+        user = User.objects.filter(pk=data['user_id'])      
+       
+        if PwResetTimestamp.objects.filter(user=user[0]):
+            PwResetTimestamp.objects.filter(user=user[0]).update(
+                timestamp=data['timestamp'],
+            )    
+            return Response({ "status": "OK - Timestamp loaded"})
+        else:
+            PwResetTimestamp.objects.create(
+                user=user[0],
+                timestamp=data['timestamp'],
+            )    
+            return Response({ "status": "OK - Timestamp loaded"})
 
 class PasswordResetView(APIView):
     def post(self, request):
         email = request.POST['email']
         get_user_obj = User.objects.filter(username=email).exists()
         if get_user_obj:
+            gmt = time.gmtime()
+            ts = calendar.timegm(gmt)
             user = User.objects.get(username=email)
             token, created = Token.objects.get_or_create(user=user)
             subject = "Password Reset request"
-            pass
             message = render_to_string("email_template_pw_reset.html", {
                 'user': user.first_name,
                 'domain': get_current_site(request).domain,
@@ -150,6 +184,7 @@ class PasswordResetView(APIView):
                 #'uid': urlsafe_base64_encode(force_bytes(user.pk)),
                 #'token': default_token_generator.make_token(user),
                 'token': token,
+                'ts': ts,
                 "protocol": 'https' if request.is_secure() else 'http'
             })
             try:
@@ -181,3 +216,6 @@ class SetNewPasswordView(APIView):
         else:
             print('User dose not exist')
             return JsonResponse({"status": 2})
+
+
+
