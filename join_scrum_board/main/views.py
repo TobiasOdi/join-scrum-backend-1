@@ -191,7 +191,7 @@ class PasswordResetView(APIView):
                 mail = send_mail(
                     subject, 
                     message, 
-                    from_email='tobias.odermatt@gmx.net',
+                    from_email='jointeam@gmx.net',
                     recipient_list = [email,], 
                     fail_silently=False)
                 return Response({ "status": 3})
