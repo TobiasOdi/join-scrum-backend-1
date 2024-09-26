@@ -137,6 +137,19 @@ class CategoriesView(APIView):
         serializer = CategoryItemSerializer(categories, many=True)
         return Response(serializer.data)  
 
+class SetCategoriesView(APIView):
+    authenticaiton_classes = [TokenAuthentication]
+    def post(self, request):
+        categories = json.loads(request.body)      
+
+        for category in categories: 
+            CategoryItem.objects.create(
+                categoryName = category['categoryName'],
+                color = category['color'],
+                categoryType = category['categoryType']
+            )
+        return Response({ "status": "OK - Categories saved in database"})
+
 class GetTimestampView(APIView): 
     def get(self, request, user_id):
         user= User.objects.get(pk=user_id)      

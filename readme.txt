@@ -1,0 +1,19 @@
+MANUAL - JOIN SCRUM BOARD (BACKEND)
+
+Setting up the scrum board following the steps below:
+
+1. Create a clone of this repository in an empty folder. The same applies to the frontend part (separate folder).
+2. Create an virtual environment besides (not in the project folder) with the following commands:
+    - Windows: 
+    - Mac: 
+    - Linux: 
+3. Install all the dependencies from the requirements.txt file.
+    - pip install -r /path/to/requirements.txt
+4. Change the allowed ports in the settings.py file to the port your frontend uses. This is necessary to be able to process the requests.
+    - ALLOWED_HOSTS / CORS_ALLOWED_ORIGINS / CSRF_COOKIE_DOMAIN / CSRF_TRUSTED_ORIGINS
+5. Set up the database.
+    - python manage.py makemigrations
+    - python manage.py migrate --run-syncdb
+    - python manage.py migrate
+6. Start the server 
+    - python manage.py runserver

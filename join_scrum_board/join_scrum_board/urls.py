@@ -32,6 +32,7 @@ urlpatterns = [
     path('user/get_timestamp/<user_id>/', GetTimestampView.as_view()),
     path('user/set_timestamp/', SetTimestampView.as_view()),
     path('data/', DataView.as_view()),
+    path('data/set_categories/', DataView.as_view()),
     path('tasks/save_task_category/<task_id>/', SaveTaskCategoryView.as_view()),
     path('tasks/save_created_category/', SaveCreatedCategoryView.as_view()),   
     path('tasks/delete_category/<category_id>/', DeleteCategoryView.as_view()),
