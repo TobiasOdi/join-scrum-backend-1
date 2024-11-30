@@ -41,7 +41,7 @@ class LoginView(APIView):
         upass = request.POST['password']
         user = authenticate(username=request.POST.get('email'), password=request.POST.get('password'))
         get_user_obj = User.objects.filter(username=email).exists()
-        pass
+
         if get_user_obj:
             get_user=User.objects.filter(username=email)
             if user:
@@ -59,7 +59,6 @@ class LoginView(APIView):
                     "userColor": userColor,
                     "token": token.key
                 })                
-                
             else:
                 print(f"Password dose not exist with username = {get_user[0].username}")
                 return JsonResponse({"status": 1})
@@ -68,6 +67,70 @@ class LoginView(APIView):
             print('Username dose not exist')
             return JsonResponse({"status": 2 })
 
+class GuestLoginView(APIView):
+    authenticaiton_classes = [TokenAuthentication]
+    def post(self, request, format=None):
+        newUserData = json.loads(request.body)       
+        email = newUserData['email']
+        upass = newUserData['password']
+        get_user_obj = User.objects.filter(username=email).exists()
+
+        if not get_user_obj:
+            print('User does not exist')            
+            new_user = User.objects.create_user(
+                username=newUserData['email'],
+                password=newUserData['password'],
+                email=newUserData['email'],
+                first_name=newUserData['first_name'],
+                last_name=newUserData['last_name']
+            )
+            new_user.set_password(upass)
+            new_user.save()
+            UserAccount.objects.create(
+                user=new_user,
+                color=newUserData['color'],
+                phone=newUserData['phone']
+            )
+            ContactItem.objects.create(
+                active_user=new_user,
+                first_name=newUserData['first_name'],
+                last_name=newUserData['last_name'],
+                email=newUserData['email'],
+                phone=newUserData['phone'],
+                color=newUserData['color'],
+            )
+            
+        user = authenticate(username=email, password=upass)
+        get_user=User.objects.filter(username=email)
+        token, created = Token.objects.get_or_create(user=user)
+        check_pass = check_password(upass, get_user[0].password)
+        login(request, user)
+        return JsonResponse({
+            "id": user.pk,
+            "username": user.username,
+            "firstname": user.first_name,
+            "lastname": user.last_name,
+            "email": user.email,
+            "userColor": newUserData['color'],
+            "token": token.key
+        })  
+                        
+"""         else:
+            userGuest = authenticate(username=email, password=upass)
+            get_user_guest=User.objects.filter(username=email)
+            token, created = Token.objects.get_or_create(user=userGuest)
+            check_pass_guest = check_password(upass, get_user_guest[0].password)
+            login(request, userGuest)
+            return JsonResponse({
+                "id": userGuest.pk,
+                "username": userGuest.username,
+                "firstname": userGuest.first_name,
+                "lastname": userGuest.last_name,
+                "email": userGuest.email,
+                "userColor": newUserData['color'],
+                "token": token.key
+            })
+ """
 class SignUpView(APIView):
     authenticaiton_classes = [TokenAuthentication]
     def post(self, request, format=None):

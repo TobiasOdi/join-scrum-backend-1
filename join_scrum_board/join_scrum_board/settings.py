@@ -43,7 +43,7 @@ CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:5500',
 ]
 
-CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOW_ALL_ORIGINS = True
 
 CORS_ALLOW_METHODS = (
     "DELETE",
@@ -67,17 +67,18 @@ CORS_ALLOW_HEADERS = (
 
 CSRF_HEADER_NAME =['X-CSRFToken', 'X-CSRF-Token']
 
-CSRF_COOKIE_DOMAIN = 'http://127.0.0.1:5500'
+CSRF_COOKIE_DOMAIN = None
+CSRF_COOKIE_SECURE = False
 
 CSRF_TRUSTED_ORIGINS = [
     'https://localhost',
     'https://127.0.0.1',
-    #'http://127.0.0.1:5500', 
-    #'http://localhost:5500', 
+    'http://127.0.0.1:5500', 
+    'http://localhost:5500', 
     #'http://127.0.0.1:5500/login.html', 
     #'http://localhost:5500/login.html',
-    #'http://127.0.0.1:8000/',
-    #'http://127.0.0.1:8000',
+    'http://127.0.0.1:8000/',
+    'http://127.0.0.1:8000',
     ]
 
 # Application definition
