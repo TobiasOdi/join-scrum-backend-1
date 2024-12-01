@@ -19,7 +19,7 @@ from add_task.views import SaveCreatedTaskView, SaveCreatedCategoryView, DeleteC
 from board.views import DeleteTaskView, SaveTaskCategoryView, SaveEditedTaskView
 
 urlpatterns = [
-    path('tsave_task_category/<int:task_id>/', SaveTaskCategoryView.as_view()),
+    path('save_task_category/<int:task_id>/', SaveTaskCategoryView.as_view()),
     path('save_created_category/', SaveCreatedCategoryView.as_view()),   
     path('delete_category/<int:category_id>/', DeleteCategoryView.as_view()),
     path('save_created_task/', SaveCreatedTaskView.as_view()),

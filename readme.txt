@@ -8,11 +8,11 @@ Setting up the scrum board following the steps below:
     - python -m venv <myenvname>
 3. Activate the virual environment:
    - Windows: venv/Scripts/activate
-   - Linux: cd <base directory>/venv/bin
-            source activate
+   - Linux: source"<base directory>/venv/bin/activate
 3. Install all the dependencies from the requirements.txt file.
     - pip install -r /path/to/requirements.txt
-4. Change the allowed ports in the settings.py file to the port your frontend uses. This is necessary to be able to process the requests.
+4. If necessary, change the allowed ports in the settings.py file to the port your frontend uses. The default port is already set to 5500. 
+   The port change is necessary to be able to process the requests.
     - ALLOWED_HOSTS / CORS_ALLOWED_ORIGINS / CSRF_TRUSTED_ORIGINS
 5. Set up the database.
     - python manage.py makemigrations
