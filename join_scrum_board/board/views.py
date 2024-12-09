@@ -22,7 +22,17 @@ class DeleteTaskView(APIView):
         #currentTask = json.loads(request.body)      
         TaskItem.objects.filter(id=task_id).delete()
         return Response({ "status": "OK - Task deleted"})
-    
+
+class SaveSubtaskStatus(APIView):
+    authenticaiton_classes = [TokenAuthentication]
+    def post(self, request, subtask_id):
+        currentSubtask = json.loads(request.body)      
+        SubtaskItem.objects.filter(id=subtask_id).update(
+            status=currentSubtask['status'], 
+        ) 
+        return Response({ "status": "OK - Subtask status changed"})
+
+
 class SaveEditedTaskView(APIView):
     authenticaiton_classes = [TokenAuthentication]
     def post(self, request, task_id):
