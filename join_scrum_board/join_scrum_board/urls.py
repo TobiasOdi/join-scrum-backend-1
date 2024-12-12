@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from main.views import DataView, SetCategoriesView
+from main.views import DataView, SetCategoriesView, TokenCheckView
 """ from add_task.views import SaveCreatedTaskView, SaveCreatedCategoryView, DeleteCategoryView
 from contacts.views import SaveCreatedContactView, SaveChangedContactView, DeleteContactView
 from board.views import DeleteTaskView, SaveTaskCategoryView, SaveEditedTaskView
@@ -24,6 +24,7 @@ from board.views import DeleteTaskView, SaveTaskCategoryView, SaveEditedTaskView
 urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
     path('admin/', admin.site.urls),
+    path('token_check/', TokenCheckView.as_view()),
     path('user/', include('main.urls')),    
     path('data/', DataView.as_view()),
     path('data/set_categories/', SetCategoriesView.as_view()),

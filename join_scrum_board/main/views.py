@@ -25,15 +25,18 @@ from django.template.loader import render_to_string
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail
 
-class IsLoggedInView(APIView):
+
+class TokenCheckView(APIView):
     authenticaiton_classes = [TokenAuthentication]
     def post(self, request, format=None):
-        if request.user.is_authenticated:
-            print(request.user.is_authenticated)
+        tokenData = json.loads(request.body)
+        token = tokenData['token']
+        existingToken = Token.objects.get(key=token)
+        if(existingToken):
             return JsonResponse({"status": 1})
         else:
-            return JsonResponse({"status": 2}) 
-
+            return JsonResponse({"status": 2})   
+    
 class LoginView(APIView):
     authenticaiton_classes = [TokenAuthentication]
     def post(self, request, format=None):
