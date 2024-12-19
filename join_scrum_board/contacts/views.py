@@ -1,7 +1,6 @@
 from django.shortcuts import render
-from django.views.decorators.csrf import csrf_exempt
 import json
-from rest_framework.views import APIView, Response# Create your views here.
+from rest_framework.views import APIView, Response
 from contacts.models import ContactItem
 from django.contrib.auth.decorators import login_required
 from rest_framework.authentication import TokenAuthentication

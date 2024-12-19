@@ -4,9 +4,6 @@ from rest_framework.views import APIView, Response
 from add_task.models import TaskItem, AssignedContactItem, SubtaskItem
 from contacts.models import ContactItem
 import json
-from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required
-from django.core import serializers
 from rest_framework.authentication import TokenAuthentication
 
   

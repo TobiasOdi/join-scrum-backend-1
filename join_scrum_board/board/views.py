@@ -1,16 +1,14 @@
 from django.shortcuts import render
 import json
-from rest_framework.views import APIView, Response# Create your views here.
+from rest_framework.views import APIView, Response
 from add_task.models import TaskItem, AssignedContactItem, SubtaskItem
 from contacts.models import ContactItem
-from django.contrib.auth.decorators import login_required
 from rest_framework.authentication import TokenAuthentication
 
 class SaveTaskCategoryView(APIView):
     authenticaiton_classes = [TokenAuthentication]
     def post(self, request, task_id):
         currentTask = json.loads(request.body)
-        #print("JSON", currentTask['id'])
         TaskItem.objects.filter(pk=task_id).update(
             statusCategory=currentTask['statusCategory'],
         )      
@@ -19,7 +17,6 @@ class SaveTaskCategoryView(APIView):
 class DeleteTaskView(APIView):
     authenticaiton_classes = [TokenAuthentication]
     def post(self, request, task_id):
-        #currentTask = json.loads(request.body)      
         TaskItem.objects.filter(id=task_id).delete()
         return Response({ "status": "OK - Task deleted"})
 

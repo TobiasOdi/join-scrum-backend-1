@@ -1,10 +1,8 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, get_user_model
+from django.shortcuts import render
+from django.contrib.auth import authenticate, login
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import User
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
 import json
 import time
 import calendar;
@@ -17,10 +15,6 @@ from main.serializers import PwResetTimestampSerializer
 from contacts.serializers import ContactItemSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
-from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
-from django.db.models.query_utils import Q
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.utils.encoding import force_bytes, force_str
 from django.template.loader import render_to_string
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail
@@ -117,23 +111,7 @@ class GuestLoginView(APIView):
             "userColor": newUserData['color'],
             "token": token.key
         })  
-                        
-"""         else:
-            userGuest = authenticate(username=email, password=upass)
-            get_user_guest=User.objects.filter(username=email)
-            token, created = Token.objects.get_or_create(user=userGuest)
-            check_pass_guest = check_password(upass, get_user_guest[0].password)
-            login(request, userGuest)
-            return JsonResponse({
-                "id": userGuest.pk,
-                "username": userGuest.username,
-                "firstname": userGuest.first_name,
-                "lastname": userGuest.last_name,
-                "email": userGuest.email,
-                "userColor": newUserData['color'],
-                "token": token.key
-            })
- """
+
 class SignUpView(APIView):
     authenticaiton_classes = [TokenAuthentication]
     def post(self, request, format=None):

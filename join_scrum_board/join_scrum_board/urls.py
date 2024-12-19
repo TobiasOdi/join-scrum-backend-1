@@ -17,10 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from main.views import DataView, SetCategoriesView, TokenCheckView
-""" from add_task.views import SaveCreatedTaskView, SaveCreatedCategoryView, DeleteCategoryView
-from contacts.views import SaveCreatedContactView, SaveChangedContactView, DeleteContactView
-from board.views import DeleteTaskView, SaveTaskCategoryView, SaveEditedTaskView
- """
+
 urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
     path('admin/', admin.site.urls),
@@ -32,21 +29,3 @@ urlpatterns = [
     path('contacts/', include('contacts.urls')),
 ]
 
-"""     
-    path('user/login/', LoginView.as_view()),
-    path('user/sign_up/', SignUpView.as_view()),
-    path('user/reset_password/', PasswordResetView.as_view()),
-    path('user/set_new_password/', SetNewPasswordView.as_view()),
-    path('user/get_timestamp/<user_id>/', GetTimestampView.as_view()),
-    path('user/set_timestamp/', SetTimestampView.as_view()),
-    path('tasks/save_task_category/<task_id>/', SaveTaskCategoryView.as_view()),
-    path('tasks/save_created_category/', SaveCreatedCategoryView.as_view()),   
-    path('tasks/delete_category/<category_id>/', DeleteCategoryView.as_view()),
-    path('tasks/save_created_task/', SaveCreatedTaskView.as_view()),
-    path('tasks/save_edited_task/<task_id>/', SaveEditedTaskView.as_view()),
-    path('tasks/delete_task/<task_id>/', DeleteTaskView.as_view()),
-    path('contacts/save_created_contact/', SaveCreatedContactView.as_view()),
-    path('contacts/save_edited_contact/', SaveChangedContactView.as_view()),
-    path('contacts/delete_contact/', DeleteContactView.as_view())
-
- """ 
