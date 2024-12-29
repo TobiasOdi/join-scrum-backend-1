@@ -2,7 +2,6 @@ from django.shortcuts import render
 import json
 from rest_framework.views import APIView, Response
 from contacts.models import ContactItem
-from django.contrib.auth.decorators import login_required
 from rest_framework.authentication import TokenAuthentication
 
 class SaveCreatedContactView(APIView):

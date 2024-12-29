@@ -29,12 +29,8 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'localhost',
     'localhost:5500',
-    #'http://localhost:5500',
     '127.0.0.1',
     '127.0.0.1:5500',
-    #'http://127.0.0.1:5500',
-    #'http://localhost:8000',
-    #'http://127.0.0.1:8000',
 ]
 CORS_ALLOWED_ORIGINS = [
     'http://localhost', 
@@ -75,8 +71,6 @@ CSRF_TRUSTED_ORIGINS = [
     'https://127.0.0.1',
     'http://127.0.0.1:5500', 
     'http://localhost:5500', 
-    #'http://127.0.0.1:5500/login.html', 
-    #'http://localhost:5500/login.html',
     'http://127.0.0.1:8000/',
     'http://127.0.0.1:8000',
     ]

@@ -1,12 +1,11 @@
 from django.shortcuts import render
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate
 from django.http import JsonResponse
-from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import User
 import json
 import time
 import calendar;
-from main.models import UserAccount, PwResetTimestamp
+from main.models import PwResetTimestamp
 from add_task.models import TaskItem, SubtaskItem, AssignedContactItem, CategoryItem
 from contacts.models import ContactItem
 from rest_framework.views import APIView, Response
@@ -15,10 +14,7 @@ from main.serializers import PwResetTimestampSerializer
 from contacts.serializers import ContactItemSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
-from django.template.loader import render_to_string
-from django.contrib.sites.shortcuts import get_current_site
-from django.core.mail import send_mail
-
+from main.helpers import *
 
 class TokenCheckView(APIView):
     authenticaiton_classes = [TokenAuthentication]
@@ -42,24 +38,10 @@ class LoginView(APIView):
         if get_user_obj:
             get_user=User.objects.filter(username=email)
             if user:
-                token, created = Token.objects.get_or_create(user=user)
-                check_pass = check_password(upass, get_user[0].password)
-                login(request, user)
-                userForColor = User.objects.get(username=request.POST.get('email'))
-                userColor = userForColor.useraccount.color
-                return JsonResponse({
-                    "id": user.pk,
-                    "username": user.username,
-                    "firstname": user.first_name,
-                    "lastname": user.last_name,
-                    "email": user.email,
-                    "userColor": userColor,
-                    "token": token.key
-                })                
+                return returnUserData(upass, get_user, request, user)
             else:
                 print(f"Password dose not exist with username = {get_user[0].username}")
-                return JsonResponse({"status": 1})
-            
+                return JsonResponse({"status": 1})   
         else:
             print('Username dose not exist')
             return JsonResponse({"status": 2 })
@@ -73,44 +55,12 @@ class GuestLoginView(APIView):
         get_user_obj = User.objects.filter(username=email).exists()
 
         if not get_user_obj:
-            print('User does not exist')            
-            new_user = User.objects.create_user(
-                username=newUserData['email'],
-                password=newUserData['password'],
-                email=newUserData['email'],
-                first_name=newUserData['first_name'],
-                last_name=newUserData['last_name']
-            )
-            new_user.set_password(upass)
-            new_user.save()
-            UserAccount.objects.create(
-                user=new_user,
-                color=newUserData['color'],
-                phone=newUserData['phone']
-            )
-            ContactItem.objects.create(
-                active_user=new_user,
-                first_name=newUserData['first_name'],
-                last_name=newUserData['last_name'],
-                email=newUserData['email'],
-                phone=newUserData['phone'],
-                color=newUserData['color'],
-            )
-            
+            createObjectsForGuestUser(newUserData)
+    
         user = authenticate(username=email, password=upass)
         get_user=User.objects.filter(username=email)
-        token, created = Token.objects.get_or_create(user=user)
-        check_pass = check_password(upass, get_user[0].password)
-        login(request, user)
-        return JsonResponse({
-            "id": user.pk,
-            "username": user.username,
-            "firstname": user.first_name,
-            "lastname": user.last_name,
-            "email": user.email,
-            "userColor": newUserData['color'],
-            "token": token.key
-        })  
+        
+        return returnGuestUserData(upass, get_user, request, user, newUserData)
 
 class SignUpView(APIView):
     authenticaiton_classes = [TokenAuthentication]
@@ -122,32 +72,7 @@ class SignUpView(APIView):
                 "status": 1
             })
         else:          
-            new_user = User.objects.create_user(
-                username=newUserData['email'],
-                password=newUserData['password'],
-                email=newUserData['email'],
-                first_name=newUserData['first_name'],
-                last_name=newUserData['last_name']
-            )
-            new_user.set_password(newUserData['password'])
-            new_user.save()
-            
-            UserAccount.objects.create(
-                user=new_user,
-                color=newUserData['color'],
-                phone=newUserData['phone']
-            )
-            
-            ContactItem.objects.create(
-                active_user=new_user,
-                first_name=newUserData['first_name'],
-                last_name=newUserData['last_name'],
-                email=newUserData['email'],
-                phone=newUserData['phone'],
-                color=newUserData['color'],
-            )
-            #userForColor = User.objects.get(username=request.POST.get('email'))
-            #userColor = userForColor.useraccount.color   
+            createObjectsForNewUser(newUserData)
             return Response({ "status": "OK - New user and contact created"})
 
 class DataView(APIView):
@@ -170,13 +95,11 @@ class DataView(APIView):
                 'assignedContacts': assignedContacts_serializer.data,
                 'contacts': contacts_serializer.data,
                 'categories': categories_serializer.data
-            })
-        
+            })       
 
 class CategoriesView(APIView): 
     authenticaiton_classes = [TokenAuthentication]
     def get(self, request, format=None):
-        #tasks = TaskItem.objects.filter(created_by=request.user)
         categories = CategoryItem.objects.all()
         serializer = CategoryItemSerializer(categories, many=True)
         return Response(serializer.data)  
@@ -229,33 +152,7 @@ class PasswordResetView(APIView):
         email = request.POST['email']
         get_user_obj = User.objects.filter(username=email).exists()
         if get_user_obj:
-            gmt = time.gmtime()
-            ts = calendar.timegm(gmt)
-            user = User.objects.get(username=email)
-            token, created = Token.objects.get_or_create(user=user)
-            subject = "Password Reset request"
-            message = render_to_string("email_template_pw_reset.html", {
-                'user': user.first_name,
-                'domain': get_current_site(request).domain,
-                'uid': user.pk,
-                #'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-                #'token': default_token_generator.make_token(user),
-                'token': token,
-                'ts': ts,
-                "protocol": 'https' if request.is_secure() else 'http'
-            })
-            try:
-                mail = send_mail(
-                    subject, 
-                    message, 
-                    from_email='jointeam@gmx.net',
-                    recipient_list = [email,], 
-                    fail_silently=False)
-                return Response({ "status": 3})
-
-            except NameError:
-                print("Problem sending reset password email", NameError)
-                return Response({ "status": 2})
+            return sendEmail(email, request)
         else:
             return Response({ "status": 1})
 
