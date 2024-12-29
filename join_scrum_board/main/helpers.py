@@ -28,7 +28,7 @@ def returnUserData(upass, get_user, request, user):
         "token": token.key
     }) 
     
-def createObjectsForGuestUser(newUserData):
+def createObjectsForGuestUser(newUserData, upass):
     print('User does not exist')            
     new_user = User.objects.create_user(
         username=newUserData['email'],

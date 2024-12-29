@@ -55,7 +55,7 @@ class GuestLoginView(APIView):
         get_user_obj = User.objects.filter(username=email).exists()
 
         if not get_user_obj:
-            createObjectsForGuestUser(newUserData)
+            createObjectsForGuestUser(newUserData, upass)
     
         user = authenticate(username=email, password=upass)
         get_user=User.objects.filter(username=email)

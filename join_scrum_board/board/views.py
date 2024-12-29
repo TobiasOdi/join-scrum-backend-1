@@ -29,7 +29,6 @@ class SaveSubtaskStatus(APIView):
         ) 
         return Response({ "status": "OK - Subtask status changed"})
 
-
 class SaveEditedTaskView(APIView):
     authenticaiton_classes = [TokenAuthentication]
     def post(self, request, task_id):
