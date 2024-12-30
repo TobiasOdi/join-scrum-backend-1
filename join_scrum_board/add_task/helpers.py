@@ -1,7 +1,7 @@
 from add_task.models import TaskItem
 
 def createNewTask(taskData, request):
-    TaskItem.objects.create(
+    return TaskItem.objects.create(
         category=taskData[0]['category'], 
         created_by=request.user,
         description=taskData[0]['description'],
