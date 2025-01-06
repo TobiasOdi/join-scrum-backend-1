@@ -21,7 +21,7 @@ class TokenCheckView(APIView):
     def post(self, request, format=None):
         tokenData = json.loads(request.body)
         token = tokenData['token']
-        existingToken = Token.objects.get(key=token)
+        existingToken = Token.objects.filter(key=token).exists()
         if(existingToken):
             return JsonResponse({"status": 1})
         else:
