@@ -7,6 +7,11 @@ from rest_framework.authentication import TokenAuthentication
 class SaveCreatedContactView(APIView):
     authenticaiton_classes = [TokenAuthentication]
     def post(self, request):
+        """ Creates a new contact item in the database.
+        Args:
+            request (json): Contact data
+        Returns a string that says "OK - New contact created".
+        """
         currentContact = json.loads(request.body)
         #contactData = currentContact[0]['taskData']
         
@@ -25,6 +30,11 @@ class SaveCreatedContactView(APIView):
 class SaveChangedContactView(APIView):
     authenticaiton_classes = [TokenAuthentication]
     def post(self, request):
+        """ Updates the changed contact item.
+        Args:
+            request (json): Contact data
+        Returns a string that says "OK - Status category updated".
+        """
         currentContact = json.loads(request.body)
         
         ContactItem.objects.filter(pk=currentContact['id']).update(
@@ -38,6 +48,11 @@ class SaveChangedContactView(APIView):
 class DeleteContactView(APIView):
     authenticaiton_classes = [TokenAuthentication]
     def post(self, request):
+        """ Deletes the contact item.
+        Args:
+            request (json): Contact data
+        Returns a string that says "OK - Contact deleted".
+        """
         currentContact = json.loads(request.body)
         
         if currentContact['active_user'] == None:
