@@ -18,6 +18,8 @@ def returnUserData(upass, get_user, request, user):
     login(request, user)
     userForColor = User.objects.get(username=request.POST.get('email'))
     userColor = userForColor.useraccount.color
+    userTextColor = userForColor.useraccount.text_color
+
     return JsonResponse({
         "id": user.pk,
         "username": user.username,
@@ -25,6 +27,7 @@ def returnUserData(upass, get_user, request, user):
         "lastname": user.last_name,
         "email": user.email,
         "userColor": userColor,
+        "userTextColor": userTextColor,
         "token": token.key
     }) 
     
@@ -42,6 +45,7 @@ def createObjectsForGuestUser(newUserData, upass):
     UserAccount.objects.create(
         user=new_user,
         color=newUserData['color'],
+        text_color=newUserData['text_color'],
         phone=newUserData['phone']
     )
     ContactItem.objects.create(
@@ -80,6 +84,7 @@ def createObjectsForNewUser(newUserData):
     UserAccount.objects.create(
         user=new_user,
         color=newUserData['color'],
+        text_color=newUserData['text_color'],
         phone=newUserData['phone']
     )
     ContactItem.objects.create(
@@ -89,6 +94,7 @@ def createObjectsForNewUser(newUserData):
         email=newUserData['email'],
         phone=newUserData['phone'],
         color=newUserData['color'],
+        text_color=newUserData['text_color'],
     )
 
 def sendEmail(email, request):

@@ -16,6 +16,7 @@ class SaveCreatedContactView(APIView):
             email=currentContact['email'],
             phone=currentContact['phone'],
             color=currentContact['color'],
+            text_color=currentContact['text_color'],
             active_user=None
         )
         

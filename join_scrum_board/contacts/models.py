@@ -10,6 +10,7 @@ class ContactItem(models.Model):
     email = models.CharField(max_length=25)
     phone = models.CharField(max_length=25)
     color = models.CharField(max_length=25)
+    text_color = models.CharField(max_length=25, null=True)
 
     def __str__(self):
         return f"({self.id})"
