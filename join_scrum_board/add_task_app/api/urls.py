@@ -14,17 +14,11 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
-from django.urls import path, include
-from board_app.api.views import DataView, SetCategoriesView
-from user_auth_app.api.views import TokenCheckView
+from django.urls import path
+from add_task_app.api.views import SaveCreatedTaskView, SaveCreatedCategoryView, DeleteCategoryView
 
 urlpatterns = [
-    path('api-auth/', include('rest_framework.urls')),
-    path('admin/', admin.site.urls),
-    path('user/', include('user_auth_app.api.urls')),    
-    path('board/', include('board_app.api.urls')),
-    path('tasks/', include('add_task_app.api.urls')),
-    path('contacts/', include('contacts_app.api.urls')),
+    path('save_created_category/', SaveCreatedCategoryView.as_view()),   
+    path('delete_category/<int:category_id>/', DeleteCategoryView.as_view()),
+    path('save_created_task/', SaveCreatedTaskView.as_view()),
 ]
-

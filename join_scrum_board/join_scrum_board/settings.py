@@ -92,10 +92,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'main',
-    'add_task',
-    'board',
-    'contacts',
+    'add_task_app',
+    'board_app',
+    'contacts_app',
+    'user_auth_app',
 ]
 
 MIDDLEWARE = [

@@ -14,17 +14,16 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
-from django.urls import path, include
-from board_app.api.views import DataView, SetCategoriesView
-from user_auth_app.api.views import TokenCheckView
+from django.urls import path
+from user_auth_app.api.views import TokenCheckView, LoginView, SignUpView, PasswordResetView, SetNewPasswordView, GetTimestampView, SetTimestampView, GuestLoginView
 
 urlpatterns = [
-    path('api-auth/', include('rest_framework.urls')),
-    path('admin/', admin.site.urls),
-    path('user/', include('user_auth_app.api.urls')),    
-    path('board/', include('board_app.api.urls')),
-    path('tasks/', include('add_task_app.api.urls')),
-    path('contacts/', include('contacts_app.api.urls')),
+    path('token_check/', TokenCheckView.as_view()),
+    path('login/', LoginView.as_view()),
+    path('guest_login/', GuestLoginView.as_view()),
+    path('sign_up/', SignUpView.as_view()),
+    path('reset_password/', PasswordResetView.as_view()),
+    path('set_new_password/', SetNewPasswordView.as_view()),
+    path('get_timestamp/<int:user_id>/', GetTimestampView.as_view()),
+    path('set_timestamp/', SetTimestampView.as_view()),
 ]
-
