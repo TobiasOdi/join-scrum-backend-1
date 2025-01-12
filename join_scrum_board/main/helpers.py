@@ -55,6 +55,7 @@ def createObjectsForGuestUser(newUserData, upass):
         email=newUserData['email'],
         phone=newUserData['phone'],
         color=newUserData['color'],
+        text_color=newUserData['text_color'],
     )
     
 def returnGuestUserData(upass, get_user, request, user, newUserData):
