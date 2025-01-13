@@ -13,6 +13,11 @@ from user_auth_app.api.helpers import *
 class TokenCheckView(APIView):
     authenticaiton_classes = [TokenAuthentication]
     def post(self, request, format=None):
+        """ Checks if the token already exists.
+        Args:
+            request (json): Token data
+        Returns a jason with the status 1 (token exists) or 2 (token does not exist).
+        """
         tokenData = json.loads(request.body)
         token = tokenData['token']
         existingToken = Token.objects.filter(key=token).exists()
@@ -24,6 +29,10 @@ class TokenCheckView(APIView):
 class LoginView(APIView):
     authenticaiton_classes = [TokenAuthentication]
     def post(self, request, format=None):
+        """ Logs the user into his account or return a json with the status 1(Incorrect password) or 2(User does not exist).
+        Args:
+            request (string): E-Mail and Password
+        """
         email = request.POST['email']
         upass = request.POST['password']
         user = authenticate(username=request.POST.get('email'), password=request.POST.get('password'))
@@ -43,6 +52,10 @@ class LoginView(APIView):
 class GuestLoginView(APIView):
     authenticaiton_classes = [TokenAuthentication]
     def post(self, request, format=None):
+        """ Logs in the Guest user. If the Guest user does not already exist, the user is created.
+        Args:
+            request (json): User data of the Guest user
+        """
         newUserData = json.loads(request.body)       
         email = newUserData['email']
         upass = newUserData['password']
@@ -57,6 +70,11 @@ class GuestLoginView(APIView):
 class SignUpView(APIView):
     authenticaiton_classes = [TokenAuthentication]
     def post(self, request, format=None):
+        """ Checks if the username (email) already exist, if not the user is created.
+        If the username already exists, it returns a json with the status 1.
+        Args:
+            request (json): New user data
+        """
         newUserData = json.loads(request.body)
         get_user_obj = User.objects.filter(username=newUserData['email']).exists()
         if get_user_obj:
@@ -69,10 +87,13 @@ class SignUpView(APIView):
 
 class GetTimestampView(APIView): 
     def get(self, request, user_id):
+        """Returns the timestamp that has been set, by resetting tha password (sending mail).
+        Args:
+            user_id (int): Id of the user
+        """
         user= User.objects.get(pk=user_id)      
         if PwResetTimestamp.objects.filter(user=user):
             user_timestamp = PwResetTimestamp.objects.filter(user=user)
-            print(user_timestamp)
             serializer = PwResetTimestampSerializer(user_timestamp[0])
             return Response(serializer.data)
         else:
@@ -82,6 +103,10 @@ class GetTimestampView(APIView):
 class SetTimestampView(APIView):
     #authenticaiton_classes = [TokenAuthentication]
     def post(self, request):
+        """ Saves the timestamp after resetting the timestamp.
+        Args:
+            request (json): User id and timestamp
+        """
         data = json.loads(request.body)
         user = User.objects.filter(pk=data['user_id'])      
        
@@ -89,16 +114,19 @@ class SetTimestampView(APIView):
             PwResetTimestamp.objects.filter(user=user[0]).update(
                 timestamp=data['timestamp'],
             )    
-            return Response({ "status": "OK - Timestamp loaded"})
+            return Response({ "status": "OK - Timestamp set"})
         else:
             PwResetTimestamp.objects.create(
                 user=user[0],
                 timestamp=data['timestamp'],
             )    
-            return Response({ "status": "OK - Timestamp loaded"})
+            return Response({ "status": "OK - Timestamp set"})
 
 class PasswordResetView(APIView):
     def post(self, request):
+        """ Checks if the user that wants to reset the password eixists and sends an email to reset the password.
+        If the user does not exist, it returns a json with the status 1.
+        """
         email = request.POST['email']
         get_user_obj = User.objects.filter(username=email).exists()
         if get_user_obj:
@@ -108,6 +136,14 @@ class PasswordResetView(APIView):
 
 class SetNewPasswordView(APIView):
     def post(self, request):
+        """ Sets the new user password if the user exists and returns a json with the status 1(new password set).
+        If the user does not exist, returns a json with the status 2(user does not exist).
+        Args:
+            request (form): User id and password
+
+        Returns:
+            _type_: _description_
+        """
         newPassword = request.POST['newPw']
         uid = request.POST['uid']
         pass
