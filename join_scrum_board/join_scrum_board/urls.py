@@ -16,8 +16,6 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from board_app.api.views import DataView, SetCategoriesView
-from user_auth_app.api.views import TokenCheckView
 
 urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
