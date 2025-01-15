@@ -14,6 +14,7 @@ Setting up the scrum board following the steps below:
 4. If necessary, change the allowed ports in the settings.py file to the port your frontend uses. The default port is already set to 5500. 
    The port change is necessary to be able to process the requests.
     - ALLOWED_HOSTS / CORS_ALLOWED_ORIGINS / CSRF_TRUSTED_ORIGINS
+    - Also change port and domain if necessary in the "email_template_pw_reset.html" file where the link to the passwort reset page is
 5. Set up the database.
     - python manage.py makemigrations
     - python manage.py migrate --run-syncdb
