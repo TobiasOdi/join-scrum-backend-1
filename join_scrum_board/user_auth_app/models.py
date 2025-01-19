@@ -10,11 +10,11 @@ class UserAccount(models.Model):
     phone = models.CharField(max_length=25, blank=True, default=None)
     
     def __str__(self):
-        return self.color
+        return f"{self.user}"
     
 class PwResetTimestamp(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     timestamp = models.IntegerField(default=0)    
     
     def __str__(self):
-        return str(self.timestamp)
+        return f"{self.user} {self.timestamp}"

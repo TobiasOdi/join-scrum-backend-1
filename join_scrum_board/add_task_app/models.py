@@ -16,7 +16,7 @@ class TaskItem(models.Model):
     statusCategory = models.CharField(max_length=25)
     
     def __str__(self):
-        return f"({self.id}) {self.title}"
+        return f"{self.id} {self.title}"
 
 class SubtaskItem(models.Model):
     parent_task_id = models.ForeignKey(TaskItem, on_delete=models.CASCADE, default=None)
@@ -24,11 +24,14 @@ class SubtaskItem(models.Model):
     status = models.CharField(max_length=6)
     
     def __str__(self):
-        return f"({self.id}) {self.subtaskName}"
+        return f"{self.parent_task_id} {self.subtaskName}"
 
 class AssignedContactItem(models.Model):
     parent_task_id = models.ForeignKey(TaskItem, on_delete=models.CASCADE, default=None)
     contact_id = models.ForeignKey(ContactItem, on_delete=models.CASCADE, default=None)
+    
+    def __str__(self):
+        return f"{self.parent_task_id} {self.contact_id}"
     
 class CategoryItem(models.Model):
     categoryName = models.CharField(max_length=25)
@@ -36,4 +39,4 @@ class CategoryItem(models.Model):
     categoryType = models.CharField(max_length=25)
     
     def __str__(self):
-        return f"({self.id}) {self.categoryName}"
+        return f"{self.categoryName}"

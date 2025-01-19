@@ -13,4 +13,4 @@ class ContactItem(models.Model):
     text_color = models.CharField(max_length=25, null=True)
 
     def __str__(self):
-        return f"({self.id})"
+        return f"({self.id} {self.first_name} {self.last_name})"
