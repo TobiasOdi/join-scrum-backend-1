@@ -33,14 +33,6 @@ class DataView(APIView):
                 'categories': categories_serializer.data
             })       
 
-""" class CategoriesView(APIView): 
-    authenticaiton_classes = [TokenAuthentication]
-    def get(self, request, format=None):
-        categories = CategoryItem.objects.all()
-        serializer = CategoryItemSerializer(categories, many=True)
-        return Response(serializer.data) 
-"""  
-
 class SetCategoriesView(APIView):
     authenticaiton_classes = [TokenAuthentication]
     def post(self, request):
@@ -113,13 +105,9 @@ class SaveEditedTaskView(APIView):
         assignedToData = currentTask[0]['assignedToData']
         get_current_Task=TaskItem.objects.filter(pk=task_id)
         
-        #Update the task item
         updateTaskItem(task_id, taskData)
-        # DELETE ALL SUBTASKS AND ASSIGNED CONTACTS THAT REFER TO THE CURRENT TASK
         SubtaskItem.objects.filter(parent_task_id=get_current_Task[0]).delete()
         AssignedContactItem.objects.filter(parent_task_id=get_current_Task[0]).delete()
-        # ADD NEW SUBTASKS AND ASSIGNED CONTACTS
         createSubtasks(subtaskData, get_current_Task)
         createAssignedContacts(assignedToData, get_current_Task)
-        
         return Response({ "status": "OK - Task edited"})
