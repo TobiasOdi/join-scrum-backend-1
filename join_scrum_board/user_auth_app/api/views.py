@@ -7,8 +7,8 @@ from rest_framework.views import APIView, Response
 from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
 from user_auth_app.models import PwResetTimestamp
-from user_auth_app.serializers import PwResetTimestampSerializer
-from user_auth_app.api.helpers import *
+from user_auth_app.api.serializers import PwResetTimestampSerializer
+from user_auth_app.helpers import *
 
 class TokenCheckView(APIView):
     authenticaiton_classes = [TokenAuthentication]

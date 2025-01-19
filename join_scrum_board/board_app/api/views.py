@@ -3,7 +3,7 @@ import json
 from rest_framework.views import APIView, Response
 from add_task_app.models import TaskItem, AssignedContactItem, SubtaskItem, CategoryItem
 from rest_framework.authentication import TokenAuthentication
-from board_app.api.helpers import *
+from board_app.helpers import *
 from contacts_app.models import ContactItem
 from add_task_app.api.serializers import TaskItemSerializer, SubtaskItemSerializer, AssignedContactItemSerializer, CategoryItemSerializer
 from contacts_app.api.serializers import ContactItemSerializer
